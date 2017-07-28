@@ -18,6 +18,8 @@ try:
     from . import des
 except ValueError:
     import des
+except ImportError:
+    import des
 import hashlib
 import hmac
 import random

@@ -17,6 +17,8 @@ try:
     from . import des_c
 except ValueError:
     import des_c
+except ImportError:
+    import des_c
 
 #---------------------------------------------------------------------
 class DES:

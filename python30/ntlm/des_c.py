@@ -18,6 +18,8 @@ try:
     from .U32 import U32
 except ValueError:
     from U32 import U32
+except ImportError:
+    from U32 import U32
 # --NON ASCII COMMENT ELIDED--
 #typedef unsigned char des_cblock[8];
 #define HDRSIZE 4
@@ -123,6 +125,8 @@ def l2cn(l1, l2, c, n):
 try:
     from .des_data import des_SPtrans, des_skb
 except ValueError:
+    from des_data import des_SPtrans, des_skb
+except ImportError:
     from des_data import des_SPtrans, des_skb
 
 def D_ENCRYPT(tup, u, t, s):

@@ -17,6 +17,8 @@ try:
     from .U32 import U32
 except ValueError:
     from U32 import U32
+except ImportError:
+    from U32 import U32
 # static unsigned long des_SPtrans[8][64]={
 
 des_SPtrans =\

@@ -18,15 +18,18 @@ try:
     from . import ntlm
 except ValueError:
     import ntlm
+except ImportError:
+    import ntlm
 import re
 
 class AbstractNtlmAuthHandler:
     
-    def __init__(self, password_mgr=None):
+    def __init__(self, password_mgr=None, context=None):
         if password_mgr is None:
             password_mgr = HTTPPasswordMgr()
         self.passwd = password_mgr
         self.add_password = self.passwd.add_password
+        self._context = context
 
     def http_error_authentication_required(self, auth_header_field, req, fp, headers):
         auth_header_value_list = headers.get_all(auth_header_field)
@@ -60,7 +63,7 @@ class AbstractNtlmAuthHandler:
                 raise urllib.request.URLError('no host given')
             h = None
             if req.get_full_url().startswith('https://'):
-                h = http.client.HTTPSConnection(host) # will parse host:port
+                h = http.client.HTTPSConnection(host, context=self._context) # will parse host:port
             else:
                 h = http.client.HTTPConnection(host) # will parse host:port
             # we must keep the connection because NTLM authenticates the connection, not single requests
@@ -100,11 +103,12 @@ class AbstractNtlmAuthHandler:
                 return addinfourl(response, response.msg, req.get_full_url(), response.code)
             except socket.error as err:
                 raise urllib.request.URLError(err)
-        else:  
+        else:
             return None
 
 
 class HTTPNtlmAuthHandler(AbstractNtlmAuthHandler, urllib.request.BaseHandler):
+# class HTTPNtlmAuthHandler(AbstractNtlmAuthHandler):
 
     auth_header = 'Authorization'
 
@@ -113,6 +117,7 @@ class HTTPNtlmAuthHandler(AbstractNtlmAuthHandler, urllib.request.BaseHandler):
 
 
 class ProxyNtlmAuthHandler(AbstractNtlmAuthHandler, urllib.request.BaseHandler):
+# class ProxyNtlmAuthHandler(AbstractNtlmAuthHandler):
     """ 
         CAUTION: this class has NOT been tested at all!!! 
         use at your own risk
@@ -140,5 +145,5 @@ if __name__ == "__main__":
     
     urllib.request.install_opener(opener)
     
-    response = urllib.request.urlopen(url)
+    response = urllib.request.urlopen(url, sslContext)
     print((response.read()))
